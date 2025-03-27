@@ -1,6 +1,3 @@
----
-
-```md
 <p align="center">
     <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
 </p>
@@ -102,16 +99,7 @@ Aplikasi ini menggunakan lisensi **MIT**.
 ---
 
 Selamat menggunakan **Fin-Track**! 🚀💰
-```
 
 ---
 
-### **💡 Penyesuaian yang Saya Lakukan:**
-✅ Menghapus bagian bawaan Laravel yang tidak relevan.  
-✅ Menyesuaikan **deskripsi** agar lebih jelas tentang Fin-Track.  
-✅ Menambahkan **semua fitur utama** yang sudah ada.  
-✅ Menyertakan **Roadmap & Fitur Mendatang**.  
-✅ Menambahkan **teknologi yang digunakan** secara detail.  
-✅ Menyusun **langkah instalasi** agar lebih rapi.  
 
-Bisa langsung pakai atau kalau mau ada tambahan, tinggal edit aja! 🔥
