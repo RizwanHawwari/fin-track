@@ -1,5 +1,3 @@
-Berikut README yang sudah disesuaikan untuk **Fin-Track**, mencakup deskripsi, fitur, teknologi, dan instruksi instalasi.  
-
 ---
 
 ```md
