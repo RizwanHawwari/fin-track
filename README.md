@@ -74,7 +74,7 @@ Aplikasi ini dirancang untuk memberikan pengalaman yang modern, minimalis, dan i
 
 6. **Jalankan Server**
    ```sh
-   php artisan serve
+   npm run dev
    ```
 
 Akses aplikasi di **[http://localhost:8000](http://localhost:8000)** 🚀
