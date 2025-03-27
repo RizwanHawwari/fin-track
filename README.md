@@ -37,7 +37,7 @@ Aplikasi ini dirancang untuk memberikan pengalaman yang modern, minimalis, dan i
 
 ## 🚀 **Teknologi yang Digunakan**
 - **Backend**: Laravel 12 (PHP 8.3)
-- **Frontend**: Blade Templates, CSS Native (tanpa Tailwind/Bootstrap)
+- **Frontend**: Blade Templates, Tailwind (v.4), SweetAlert2
 - **Database**: MySQL
 - **Charting**: Chart.js (untuk visualisasi data)
 - **Autentikasi**: Laravel Breeze
