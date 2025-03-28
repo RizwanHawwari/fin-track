@@ -8,32 +8,33 @@ Branch `v1-UI-Improvement` berfokus pada peningkatan tampilan dan pengalaman pen
 
 ---
 
-## ✨ **Apa yang Ditingkatkan?**  
-### **📌 Peningkatan UI/UX**
-- **Desain Modal yang Lebih Responsif**  
-  - Modal kini otomatis menyesuaikan ukuran pada mobile dan tablet agar lebih nyaman dilihat.  
-  - Ukuran teks, padding, dan elemen dalam modal dikurangi untuk layar kecil.
+## ✨ **Apa yang Baru di Branch Ini?**  
 
- <p align="center">
-    <img src="https://i.imgur.com/4fAlV1E.png" width="600">
-</p>
+### **📌 Penambahan Fitur & Informasi**  
+- **Modal Informasi di Transactions & Accounts**  
+  - Kini tersedia **modal informasi** yang menjelaskan cara kerja transaksi dan akun keuangan secara jelas dan user-friendly.  
+  - Informasi disajikan dengan tampilan modern tanpa klaim koneksi langsung ke akun keuangan untuk menghindari kesalahpahaman.
+ 
+    <p align="center">
+            <img src="https://i.imgur.com/4fAlV1E.png" width="600">
+        </p>
 
-<p align="center">
-    <img src="https://i.imgur.com/uzaFqkh.png" width="600">
-</p>
-    
-- **Perbaikan Modal & Informasi pada Transactions & Accounts**  
-  - Ditambahkan **modal informasi** yang menjelaskan fitur transaksi dan akun keuangan secara user-friendly.  
-  - Modal tidak mengklaim koneksi langsung ke akun keuangan, agar user tidak salah paham.
-   
-- **Peningkatan Tampilan Search Bar**  
-  - Fix bug search bar yang muncul di atas modal.  
-  - Meningkatkan transisi & shadow agar lebih halus saat fokus.  
+- **Tampilan Modal yang Lebih Nyaman di Mobile & Tablet**  
+  - Ukuran modal, teks, dan elemen dalamnya sudah disesuaikan agar tetap nyaman digunakan di layar kecil.  
+  - Tata letak lebih rapi sehingga informasi tetap mudah dibaca.
+ 
+    <p align="center">
+            <img src="https://i.imgur.com/uzaFqkh.png" width="600">
+        </p>
 
-### **🆕 Fitur Baru**
-- **Notifikasi Anggaran (Budgeting) melalui Icon Lonceng**  
-  - Sebelumnya berupa peringatan visual, kini berubah menjadi notifikasi agar lebih intuitif.  
+- **Search Bar Kini Berfungsi dengan Baik**  
+  - Bug yang menyebabkan search bar muncul di atas modal telah diperbaiki.  
+  - Tampilan dan transisi search bar lebih halus saat digunakan.  
 
+- **Pemberitahuan Anggaran (Budgeting) dengan Icon Lonceng**  
+  - Sekarang, notifikasi anggaran tidak hanya sekadar peringatan visual, tapi juga muncul dalam bentuk **ikon lonceng** untuk pengalaman yang lebih intuitif.  
+
+Branch ini berfokus pada penambahan informasi dan kemudahan dalam memahami fitur yang ada di aplikasi. 🚀
 ---
 
 ## 🚀 **Cara Menggunakan Branch Ini**
