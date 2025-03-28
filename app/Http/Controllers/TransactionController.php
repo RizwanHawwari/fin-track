@@ -22,17 +22,14 @@ class TransactionController extends Controller
     public function index()
     {
         $userId = Auth::id();
-    $transactions = Transaction::where('user_id', $userId)
-                    ->with('category')
-                    ->latest()
-                    ->paginate(10);
+        $transactions = Transaction::where('user_id', $userId)->with('category')->latest()->paginate(10);
 
-    return view('transactions.index', compact('transactions'));
+        return view('transactions.index', compact('transactions'));
     }
 
     public function create()
     {
-        $categories = auth()->user()->categories; 
+        $categories = auth()->user()->categories;
         $accounts = Account::where('user_id', Auth::id())->get(); // Load akun milik user
 
         return view('transactions.create', compact('categories', 'accounts'));
@@ -41,150 +38,141 @@ class TransactionController extends Controller
     public function store(StoreTransactionRequest $request)
     {
         $user = Auth::user();
-    
-        $account = Account::where('id', $request->account_id)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
-    
+
+        $account = Account::where('id', $request->account_id)->where('user_id', $user->id)->firstOrFail();
+
         $cleanAmount = str_replace('.', '', $request->amount);
         $formattedAmount = number_format((float) $cleanAmount, 2, '.', '');
-    
+
         // 🔹 CEK SALDO AKUN SEBELUM MENYIMPAN TRANSAKSI
         if ($request->type === 'expense' && $formattedAmount > $account->balance) {
             return redirect()->back()->with('error', 'Saldo akun tidak mencukupi untuk transaksi ini.');
         }
-    
-        $transaction = Transaction::create([
-            'user_id' => $user->id,
-            'amount' => $formattedAmount,
-        ] + $request->only([
-            'account_id', 'category_id', 'transaction_date', 'type', 'description'
-        ]));
-    
+
+        $transaction = Transaction::create(
+            [
+                'user_id' => $user->id,
+                'amount' => $formattedAmount,
+            ] + $request->only(['account_id', 'category_id', 'transaction_date', 'type', 'description']),
+        );
+
         // 🔹 UPDATE SALDO AKUN
         if ($transaction->type === 'income') {
             $account->increment('balance', $formattedAmount);
         } else {
             $account->decrement('balance', $formattedAmount);
         }
-    
+
         // 🔹 SIMPAN KE BALANCE LOGS
         BalanceLog::create([
             'account_id' => $account->id,
             'amount' => $formattedAmount,
             'type' => $transaction->type,
         ]);
-    
+
         // 🔹 CEK DAN UPDATE BUDGET JIKA TRANSAKSI 'EXPENSE'
         if ($transaction->type === 'expense') {
-            $budget = Budget::where('category_id', $transaction->category_id)
-                ->where('user_id', $user->id)
-                ->where('month', date('Y-m'))
-                ->first();
-    
+            $budget = Budget::where('category_id', $transaction->category_id)->where('user_id', $user->id)->where('month', date('Y-m'))->first();
+
             if ($budget) {
                 $budget->increment('spent', $formattedAmount);
-    
+
                 // 🔹 Hitung persentase penggunaan budget
                 $percentUsed = ($budget->spent / $budget->amount) * 100;
-    
+
                 // 🔹 Jika penggunaan budget di antara 80% - 99%, kirim Warning
                 if ($percentUsed >= 80 && $percentUsed < 100) {
                     $user->notify(new \App\Notifications\BudgetWarningNotification($budget));
                 }
-    
+
                 // 🔹 Jika penggunaan sudah mencapai atau melebihi 100%, kirim ThresholdReached
                 if ($percentUsed >= 100) {
                     $user->notify(new \App\Notifications\BudgetThresholdReached($budget));
                 }
             }
         }
-    
+
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
-    }    
-
-public function update(Request $request, Transaction $transaction)
-{
-    $this->authorize('update', $transaction);
-
-    $request->merge(['amount' => str_replace('.', '', $request->amount)]);
-
-    $validated = $request->validate([
-        'transaction_date' => 'required|date',
-        'description' => 'required|string|max:255',
-        'amount' => 'required|numeric|min:1',
-        'type' => 'required|in:income,expense',
-        'category_id' => 'required|exists:categories,id',
-        'account_id' => 'required|exists:accounts,id',
-    ]);
-
-    $user = Auth::user();
-    $account = Account::where('id', $transaction->account_id)
-        ->where('user_id', Auth::id())
-        ->firstOrFail();
-
-    $cleanAmount = str_replace('.', '', $validated['amount']);
-    $formattedAmount = number_format((float) $cleanAmount, 2, '.', '');
-
-    // 🔹 KEMBALIKAN SALDO SEBELUM UPDATE
-    if ($transaction->type === 'income') {
-        $account->decrement('balance', $transaction->amount);
-    } else {
-        $account->increment('balance', $transaction->amount);
     }
 
-    // 🔹 CEK SALDO SEBELUM UPDATE
-    if ($validated['type'] === 'expense' && $formattedAmount > $account->balance) {
-        return redirect()->back()->with('error', 'Saldo akun tidak mencukupi untuk transaksi ini.');
-    }
+    public function update(Request $request, Transaction $transaction)
+    {
+        $this->authorize('update', $transaction);
 
-    // 🔹 UPDATE TRANSAKSI
-    $transaction->update([
-        'amount' => $formattedAmount,
-    ] + $validated);
+        $request->merge(['amount' => str_replace('.', '', $request->amount)]);
 
-    // 🔹 UPDATE SALDO AKUN
-    if ($transaction->type === 'income') {
-        $account->increment('balance', $formattedAmount);
-    } else {
-        $account->decrement('balance', $formattedAmount);
-    }
+        $validated = $request->validate([
+            'transaction_date' => 'required|date',
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:1',
+            'type' => 'required|in:income,expense',
+            'category_id' => 'required|exists:categories,id',
+            'account_id' => 'required|exists:accounts,id',
+        ]);
 
-    // 🔹 SIMPAN KE BALANCE LOGS
-    BalanceLog::create([
-        'account_id' => $account->id,
-        'amount' => $formattedAmount,
-        'type' => $transaction->type,
-    ]);
+        $user = Auth::user();
+        $account = Account::where('id', $transaction->account_id)->where('user_id', Auth::id())->firstOrFail();
 
-    // 🔹 UPDATE BUDGET JIKA TRANSAKSI 'EXPENSE'
-    if ($transaction->type === 'expense') {
-        $budget = Budget::where('category_id', $transaction->category_id)
-            ->where('user_id', $user->id)
-            ->where('month', date('Y-m'))
-            ->first();
+        $cleanAmount = str_replace('.', '', $validated['amount']);
+        $formattedAmount = number_format((float) $cleanAmount, 2, '.', '');
 
-        if ($budget) {
-            $budget->increment('spent', $formattedAmount);
+        // 🔹 KEMBALIKAN SALDO SEBELUM UPDATE
+        if ($transaction->type === 'income') {
+            $account->decrement('balance', $transaction->amount);
+        } else {
+            $account->increment('balance', $transaction->amount);
+        }
 
-            // 🔹 Hitung persentase penggunaan budget
-            $percentUsed = ($budget->spent / $budget->amount) * 100;
+        // 🔹 CEK SALDO SEBELUM UPDATE
+        if ($validated['type'] === 'expense' && $formattedAmount > $account->balance) {
+            return redirect()->back()->with('error', 'Saldo akun tidak mencukupi untuk transaksi ini.');
+        }
 
-            // 🔹 Jika penggunaan budget di antara 80% - 99%, kirim Warning
-            if ($percentUsed >= 80 && $percentUsed < 100) {
-                $user->notify(new \App\Notifications\BudgetWarningNotification($budget));
-            }
+        // 🔹 UPDATE TRANSAKSI
+        $transaction->update(
+            [
+                'amount' => $formattedAmount,
+            ] + $validated,
+        );
 
-            // 🔹 Jika penggunaan sudah mencapai atau melebihi 100%, kirim ThresholdReached
-            if ($percentUsed >= 100) {
-                $user->notify(new \App\Notifications\BudgetThresholdReached($budget));
+        // 🔹 UPDATE SALDO AKUN
+        if ($transaction->type === 'income') {
+            $account->increment('balance', $formattedAmount);
+        } else {
+            $account->decrement('balance', $formattedAmount);
+        }
+
+        // 🔹 SIMPAN KE BALANCE LOGS
+        BalanceLog::create([
+            'account_id' => $account->id,
+            'amount' => $formattedAmount,
+            'type' => $transaction->type,
+        ]);
+
+        // 🔹 UPDATE BUDGET JIKA TRANSAKSI 'EXPENSE'
+        if ($transaction->type === 'expense') {
+            $budget = Budget::where('category_id', $transaction->category_id)->where('user_id', $user->id)->where('month', date('Y-m'))->first();
+
+            if ($budget) {
+                $budget->increment('spent', $formattedAmount);
+
+                // 🔹 Hitung persentase penggunaan budget
+                $percentUsed = ($budget->spent / $budget->amount) * 100;
+
+                // 🔹 Jika penggunaan budget di antara 80% - 99%, kirim Warning
+                if ($percentUsed >= 80 && $percentUsed < 100) {
+                    $user->notify(new \App\Notifications\BudgetWarningNotification($budget));
+                }
+
+                // 🔹 Jika penggunaan sudah mencapai atau melebihi 100%, kirim ThresholdReached
+                if ($percentUsed >= 100) {
+                    $user->notify(new \App\Notifications\BudgetThresholdReached($budget));
+                }
             }
         }
+
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui!');
     }
-
-    return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui!');
-}
-
 
     public function edit(Transaction $transaction)
     {
@@ -197,42 +185,36 @@ public function update(Request $request, Transaction $transaction)
     }
 
     public function destroy(Transaction $transaction)
-{
-    $this->authorize('delete', $transaction);
+    {
+        $this->authorize('delete', $transaction);
 
-    $account = Account::where('id', $transaction->account_id)
-        ->where('user_id', Auth::id())
-        ->firstOrFail();
+        $account = Account::where('id', $transaction->account_id)->where('user_id', Auth::id())->firstOrFail();
 
-    // 🔹 Kembalikan saldo akun sebelum transaksi dihapus
-    if ($transaction->type === 'income') {
-        $account->decrement('balance', $transaction->amount);
-    } else {
-        $account->increment('balance', $transaction->amount);
-    }
-
-    // 🔹 Kurangi spent dari budget kalau transaksi 'expense'
-    if ($transaction->type === 'expense') {
-        $budget = Budget::where('user_id', Auth::id())
-            ->where('category_id', $transaction->category_id)
-            ->where('month', date('Y-m'))
-            ->first();
-
-        if ($budget) {
-            $budget->decrement('spent', $transaction->amount);
+        // 🔹 Kembalikan saldo akun sebelum transaksi dihapus
+        if ($transaction->type === 'income') {
+            $account->decrement('balance', $transaction->amount);
+        } else {
+            $account->increment('balance', $transaction->amount);
         }
+
+        // 🔹 Kurangi spent dari budget kalau transaksi 'expense'
+        if ($transaction->type === 'expense') {
+            $budget = Budget::where('user_id', Auth::id())->where('category_id', $transaction->category_id)->where('month', date('Y-m'))->first();
+
+            if ($budget) {
+                $budget->decrement('spent', $transaction->amount);
+            }
+        }
+
+        // 🔹 SIMPAN KE BALANCE LOGS
+        BalanceLog::create([
+            'account_id' => $account->id,
+            'amount' => $transaction->amount,
+            'type' => 'delete_' . $transaction->type, // Menandai bahwa ini dari transaksi yang dihapus
+        ]);
+
+        $transaction->delete();
+
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
     }
-
-    // 🔹 SIMPAN KE BALANCE LOGS
-    BalanceLog::create([
-        'account_id' => $account->id,
-        'amount' => $transaction->amount,
-        'type' => 'delete_' . $transaction->type, // Menandai bahwa ini dari transaksi yang dihapus
-    ]);
-
-    $transaction->delete();
-
-    return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
-}
-
 }

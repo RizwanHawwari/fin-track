@@ -10,7 +10,7 @@ class NotificationController extends Controller
     public function read($id)
     {
         $notification = DatabaseNotification::findOrFail($id);
-        
+
         if ($notification->notifiable_id === auth()->id()) {
             $notification->markAsRead();
         }
@@ -18,4 +18,3 @@ class NotificationController extends Controller
         return back();
     }
 }
-

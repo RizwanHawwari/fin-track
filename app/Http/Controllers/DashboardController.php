@@ -11,128 +11,113 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     public function index()
-{
-    $userId = Auth::id();
+    {
+        $userId = Auth::id();
 
-    $totals = Transaction::where('user_id', $userId)
-        ->selectRaw("
+        $totals = Transaction::where('user_id', $userId)
+            ->selectRaw(
+                "
             SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
             SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense
-        ")
-        ->first();
+        ",
+            )
+            ->first();
 
-    $totalIncome = $totals->total_income ?? 0;
-    $totalExpense = $totals->total_expense ?? 0;
+        $totalIncome = $totals->total_income ?? 0;
+        $totalExpense = $totals->total_expense ?? 0;
 
-    $accounts = Account::where('user_id', $userId)->get();
-    $totalAccountsBalance = $accounts->sum('balance');
-    $totalSaldo = Account::where('user_id', Auth::id())->sum('balance');
+        $accounts = Account::where('user_id', $userId)->get();
+        $totalAccountsBalance = $accounts->sum('balance');
+        $totalSaldo = Account::where('user_id', Auth::id())->sum('balance');
 
-    $transactions = Transaction::where('user_id', $userId)
-        ->with('category')
-        ->latest()
-        ->limit(5)
-        ->get();
+        $transactions = Transaction::where('user_id', $userId)->with('category')->latest()->limit(5)->get();
 
-    $balanceHistory = Transaction::selectRaw('
-            DATE_FORMAT(transaction_date, "%Y-%m") as month, 
+        $balanceHistory = Transaction::selectRaw(
+            '
+            DATE_FORMAT(transaction_date, "%Y-%m") as month,
             SUM(amount) as balance
-        ')
-        ->where('user_id', $userId)
-        ->groupBy('month')
-        ->orderBy('month', 'asc')
-        ->get();
+        ',
+        )
+            ->where('user_id', $userId)
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
 
-    // 🔹 Ambil notifikasi terbaru
-    $notifications = auth()->user()->unreadNotifications;
+        // 🔹 Ambil notifikasi terbaru
+        $notifications = auth()->user()->unreadNotifications;
 
-    return view('dashboard', compact(
-        'totalIncome', 'totalExpense', 'accounts', 'transactions', 
-        'balanceHistory', 'totalSaldo', 'totalAccountsBalance', 'notifications'
-    ));
-}
-
-
+        return view('dashboard', compact('totalIncome', 'totalExpense', 'accounts', 'transactions', 'balanceHistory', 'totalSaldo', 'totalAccountsBalance', 'notifications'));
+    }
 
     // Endpoint untuk mengambil data dashboard untuk chart
     public function dashboardData()
-{
-    $userId = Auth::id();
-    $today = Carbon::today();
-    $currentMonth = Carbon::now()->format('Y-m');
+    {
+        $userId = Auth::id();
+        $today = Carbon::today();
+        $currentMonth = Carbon::now()->format('Y-m');
 
-    // 🔹 Pemasukan vs Pengeluaran
-    $totals = Transaction::where('user_id', $userId)
-        ->selectRaw("
+        // 🔹 Pemasukan vs Pengeluaran
+        $totals = Transaction::where('user_id', $userId)
+            ->selectRaw(
+                "
             SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
             SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense
-        ")
-        ->first();
+        ",
+            )
+            ->first();
 
-    $income = (int) ($totals->total_income ?? 0);
-    $expense = (int) ($totals->total_expense ?? 0);
+        $income = (int) ($totals->total_income ?? 0);
+        $expense = (int) ($totals->total_expense ?? 0);
 
-    // 🔹 Saldo per bulan
-    $balanceHistory = Transaction::where('user_id', $userId)
-        ->selectRaw('DATE_FORMAT(transaction_date, "%Y-%m") as date, SUM(amount) as balance')
-        ->groupBy('date')
-        ->orderBy('date', 'asc')
-        ->get()
-        ->map(fn($item) => ['date' => $item->date, 'balance' => (int) $item->balance]);
+        // 🔹 Saldo per bulan
+        $balanceHistory = Transaction::where('user_id', $userId)->selectRaw('DATE_FORMAT(transaction_date, "%Y-%m") as date, SUM(amount) as balance')->groupBy('date')->orderBy('date', 'asc')->get()->map(fn($item) => ['date' => $item->date, 'balance' => (int) $item->balance]);
 
-    // 🔹 Budget per kategori
-    $budgetUsage = \DB::table('budgets')
-        ->join('categories', 'budgets.category_id', '=', 'categories.id')
-        ->leftJoin('transactions', function ($join) use ($userId, $currentMonth) {
-            $join->on('budgets.category_id', '=', 'transactions.category_id')
-                ->where('transactions.user_id', '=', $userId)
-                ->whereRaw('DATE_FORMAT(transactions.transaction_date, "%Y-%m") = ?', [$currentMonth]);
-        })
-        ->where('budgets.user_id', $userId)
-        ->groupBy('categories.name', 'budgets.amount')
-        ->selectRaw('
+        // 🔹 Budget per kategori
+        $budgetUsage = \DB::table('budgets')
+            ->join('categories', 'budgets.category_id', '=', 'categories.id')
+            ->leftJoin('transactions', function ($join) use ($userId, $currentMonth) {
+                $join
+                    ->on('budgets.category_id', '=', 'transactions.category_id')
+                    ->where('transactions.user_id', '=', $userId)
+                    ->whereRaw('DATE_FORMAT(transactions.transaction_date, "%Y-%m") = ?', [$currentMonth]);
+            })
+            ->where('budgets.user_id', $userId)
+            ->groupBy('categories.name', 'budgets.amount')
+            ->selectRaw(
+                '
             categories.name as category,
             budgets.amount as budget,
             COALESCE(SUM(transactions.amount), 0) as spent
-        ')
-        ->get();
+        ',
+            )
+            ->get();
 
-    // 🔹 Total budget vs sisa budget bulan ini
-    $totalBudget = $budgetUsage->sum('budget');
-    $totalSpent = $budgetUsage->sum('spent');
-    $remainingBudget = $totalBudget - $totalSpent;
+        // 🔹 Total budget vs sisa budget bulan ini
+        $totalBudget = $budgetUsage->sum('budget');
+        $totalSpent = $budgetUsage->sum('spent');
+        $remainingBudget = $totalBudget - $totalSpent;
 
-    // 🔹 Rata-rata pengeluaran harian bulan ini
-    $daysPassed = Carbon::now()->day;
-    $dailyExpenseAvg = $daysPassed > 0 ? (int) round($totalSpent / $daysPassed) : 0;
+        // 🔹 Rata-rata pengeluaran harian bulan ini
+        $daysPassed = Carbon::now()->day;
+        $dailyExpenseAvg = $daysPassed > 0 ? (int) round($totalSpent / $daysPassed) : 0;
 
-    // 🔹 Prediksi saldo akhir bulan (asumsi pemasukan tetap)
-    $predictedBalance = Account::where('user_id', $userId)->sum('balance') - $totalSpent;
+        // 🔹 Prediksi saldo akhir bulan (asumsi pemasukan tetap)
+        $predictedBalance = Account::where('user_id', $userId)->sum('balance') - $totalSpent;
 
-    // 🔹 Kategori pengeluaran terbesar
-    $topCategories = Transaction::where('transactions.user_id', $userId) 
-    ->where('transactions.type', 'expense')
-    ->join('categories', 'transactions.category_id', '=', 'categories.id')
-    ->selectRaw('categories.name, SUM(transactions.amount) as total_spent')
-    ->groupBy('categories.name')
-    ->orderByDesc('total_spent')
-    ->limit(5)
-    ->get();
+        // 🔹 Kategori pengeluaran terbesar
+        $topCategories = Transaction::where('transactions.user_id', $userId)->where('transactions.type', 'expense')->join('categories', 'transactions.category_id', '=', 'categories.id')->selectRaw('categories.name, SUM(transactions.amount) as total_spent')->groupBy('categories.name')->orderByDesc('total_spent')->limit(5)->get();
 
-
-    return response()->json([
-        'income' => $income,
-        'expense' => $expense,
-        'balanceHistory' => $balanceHistory,
-        'budgetUsage' => $budgetUsage,
-        'totalBudget' => $totalBudget,
-        'totalSpent' => $totalSpent,
-        'remainingBudget' => $remainingBudget,
-        'dailyExpenseAvg' => $dailyExpenseAvg,
-        'predictedBalance' => $predictedBalance,
-        'topCategories' => $topCategories
-    ]);
+        return response()->json([
+            'income' => $income,
+            'expense' => $expense,
+            'balanceHistory' => $balanceHistory,
+            'budgetUsage' => $budgetUsage,
+            'totalBudget' => $totalBudget,
+            'totalSpent' => $totalSpent,
+            'remainingBudget' => $remainingBudget,
+            'dailyExpenseAvg' => $dailyExpenseAvg,
+            'predictedBalance' => $predictedBalance,
+            'topCategories' => $topCategories,
+        ]);
+    }
 }
-
-}
-

@@ -31,4 +31,3 @@ class BudgetThresholdReached extends Notification
         ];
     }
 }
-

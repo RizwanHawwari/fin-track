@@ -23,34 +23,32 @@ class UserCategoryController extends Controller
     }
 
     public function update(Request $request)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    // Ambil kategori yang dipilih user
-    $selectedCategories = $request->input('categories', []);
+        // Ambil kategori yang dipilih user
+        $selectedCategories = $request->input('categories', []);
 
-    // Sinkronisasi kategori user (hapus yang lama, tambah yang baru)
-    $user->categories()->sync($selectedCategories);
+        // Sinkronisasi kategori user (hapus yang lama, tambah yang baru)
+        $user->categories()->sync($selectedCategories);
 
-    return redirect()->route('user.categories.index')->with('success', 'Kategori berhasil diperbarui!');
-}
+        return redirect()->route('user.categories.index')->with('success', 'Kategori berhasil diperbarui!');
+    }
 
-public function index()
-{
-    $user = auth()->user();
-    $categories = Category::where('is_default', true)->get();
-    $selectedCategories = $user->categories->pluck('id')->toArray();
+    public function index()
+    {
+        $user = auth()->user();
+        $categories = Category::where('is_default', true)->get();
+        $selectedCategories = $user->categories->pluck('id')->toArray();
 
-    return response()->json([
-        'categories' => $categories,
-        'selectedCategories' => $selectedCategories,
-    ]);
-}
+        return response()->json([
+            'categories' => $categories,
+            'selectedCategories' => $selectedCategories,
+        ]);
+    }
 
-public function create()
-{
-    return view('user.create-category'); // Pastikan file Blade ini ada
-}
-
-
+    public function create()
+    {
+        return view('user.create-category'); // Pastikan file Blade ini ada
+    }
 }

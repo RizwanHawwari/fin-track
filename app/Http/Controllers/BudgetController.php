@@ -19,12 +19,10 @@ class BudgetController extends Controller
     }
 
     public function create()
-{
-    $categories = auth()->user()->categories; // Ambil kategori dari pivot table user_categories
-    return view('budgets.create', compact('categories'));
-}
-
-
+    {
+        $categories = auth()->user()->categories; // Ambil kategori dari pivot table user_categories
+        return view('budgets.create', compact('categories'));
+    }
 
     public function store(Request $request)
     {
@@ -48,7 +46,7 @@ class BudgetController extends Controller
     public function edit(Budget $budget)
     {
         $this->authorize('update', $budget);
-        $categories = auth()->user()->categories; 
+        $categories = auth()->user()->categories;
         return view('budgets.edit', compact('budget', 'categories'));
     }
 
@@ -73,4 +71,3 @@ class BudgetController extends Controller
         return redirect()->route('budgets.index')->with('success', 'Budget berhasil dihapus!');
     }
 }
-
