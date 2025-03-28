@@ -12,10 +12,20 @@ Branch `v1-UI-Improvement` berfokus pada peningkatan tampilan dan pengalaman pen
 ### **📌 Peningkatan UI/UX**
 - **Desain Modal yang Lebih Responsif**  
   - Modal kini otomatis menyesuaikan ukuran pada mobile dan tablet agar lebih nyaman dilihat.  
-  - Ukuran teks, padding, dan elemen dalam modal dikurangi untuk layar kecil.  
+  - Ukuran teks, padding, dan elemen dalam modal dikurangi untuk layar kecil.
+
+ <p align="center">
+    <img src="https://i.imgur.com/4fAlV1E.png" width="600">
+</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/uzaFqkh.png" width="600">
+</p>
+    
 - **Perbaikan Modal & Informasi pada Transactions & Accounts**  
   - Ditambahkan **modal informasi** yang menjelaskan fitur transaksi dan akun keuangan secara user-friendly.  
-  - Modal tidak mengklaim koneksi langsung ke akun keuangan, agar user tidak salah paham.  
+  - Modal tidak mengklaim koneksi langsung ke akun keuangan, agar user tidak salah paham.
+   
 - **Peningkatan Tampilan Search Bar**  
   - Fix bug search bar yang muncul di atas modal.  
   - Meningkatkan transisi & shadow agar lebih halus saat fokus.  
