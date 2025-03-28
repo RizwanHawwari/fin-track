@@ -58,8 +58,10 @@ class DashboardController extends Controller
     public function dashboardData()
 {
     $userId = Auth::id();
+    $today = Carbon::today();
+    $currentMonth = Carbon::now()->format('Y-m');
 
-    // Pemasukan vs Pengeluaran
+    // 🔹 Pemasukan vs Pengeluaran
     $totals = Transaction::where('user_id', $userId)
         ->selectRaw("
             SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
@@ -67,28 +69,70 @@ class DashboardController extends Controller
         ")
         ->first();
 
-    $income = (int) ($totals->total_income ?? 0); // Cast to integer
-    $expense = (int) ($totals->total_expense ?? 0); // Cast to integer
+    $income = (int) ($totals->total_income ?? 0);
+    $expense = (int) ($totals->total_expense ?? 0);
 
-    // Saldo perbulan
-    $balanceHistory = Transaction::selectRaw('
-            DATE_FORMAT(transaction_date, "%Y-%m") as date, 
-            SUM(amount) as balance
-        ')
-        ->where('user_id', $userId)
+    // 🔹 Saldo per bulan
+    $balanceHistory = Transaction::where('user_id', $userId)
+        ->selectRaw('DATE_FORMAT(transaction_date, "%Y-%m") as date, SUM(amount) as balance')
         ->groupBy('date')
         ->orderBy('date', 'asc')
         ->get()
-        ->map(function ($item) {
-            $item->balance = (int) $item->balance;  // Cast balance to integer
-            return $item;
-        });
+        ->map(fn($item) => ['date' => $item->date, 'balance' => (int) $item->balance]);
+
+    // 🔹 Budget per kategori
+    $budgetUsage = \DB::table('budgets')
+        ->join('categories', 'budgets.category_id', '=', 'categories.id')
+        ->leftJoin('transactions', function ($join) use ($userId, $currentMonth) {
+            $join->on('budgets.category_id', '=', 'transactions.category_id')
+                ->where('transactions.user_id', '=', $userId)
+                ->whereRaw('DATE_FORMAT(transactions.transaction_date, "%Y-%m") = ?', [$currentMonth]);
+        })
+        ->where('budgets.user_id', $userId)
+        ->groupBy('categories.name', 'budgets.amount')
+        ->selectRaw('
+            categories.name as category,
+            budgets.amount as budget,
+            COALESCE(SUM(transactions.amount), 0) as spent
+        ')
+        ->get();
+
+    // 🔹 Total budget vs sisa budget bulan ini
+    $totalBudget = $budgetUsage->sum('budget');
+    $totalSpent = $budgetUsage->sum('spent');
+    $remainingBudget = $totalBudget - $totalSpent;
+
+    // 🔹 Rata-rata pengeluaran harian bulan ini
+    $daysPassed = Carbon::now()->day;
+    $dailyExpenseAvg = $daysPassed > 0 ? (int) round($totalSpent / $daysPassed) : 0;
+
+    // 🔹 Prediksi saldo akhir bulan (asumsi pemasukan tetap)
+    $predictedBalance = Account::where('user_id', $userId)->sum('balance') - $totalSpent;
+
+    // 🔹 Kategori pengeluaran terbesar
+    $topCategories = Transaction::where('transactions.user_id', $userId) 
+    ->where('transactions.type', 'expense')
+    ->join('categories', 'transactions.category_id', '=', 'categories.id')
+    ->selectRaw('categories.name, SUM(transactions.amount) as total_spent')
+    ->groupBy('categories.name')
+    ->orderByDesc('total_spent')
+    ->limit(5)
+    ->get();
+
 
     return response()->json([
         'income' => $income,
         'expense' => $expense,
         'balanceHistory' => $balanceHistory,
+        'budgetUsage' => $budgetUsage,
+        'totalBudget' => $totalBudget,
+        'totalSpent' => $totalSpent,
+        'remainingBudget' => $remainingBudget,
+        'dailyExpenseAvg' => $dailyExpenseAvg,
+        'predictedBalance' => $predictedBalance,
+        'topCategories' => $topCategories
     ]);
 }
+
 }
 
