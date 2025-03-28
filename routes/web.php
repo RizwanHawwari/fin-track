@@ -24,7 +24,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 });
 
-Route::get('/dashboard/data', [DashboardController::class, 'dashboardData']);
+Route::get('/dashboard-data', [DashboardController::class, 'dashboardData'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
 Route::resource('accounts', AccountController::class);

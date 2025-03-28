@@ -154,35 +154,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Left column (2/3 width) - Moved down for mobile -->
-                <div class="lg:col-span-2 space-y-8 order-2 lg:order-1">
-                    <!-- Financial Statistics -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Statistik Keuangan</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Pemasukan vs Pengeluaran -->
-                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
-                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Pemasukan vs Pengeluaran</h4>
-                                    <div class="h-64">
-                                        <canvas id="incomeExpenseChart"></canvas>
-                                    </div>
-                                </div>
-                                
-                                <!-- Saldo Perbulan -->
-                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
-                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Saldo Perbulan</h4>
-                                    <div class="h-64">
-                                        <canvas id="balanceHistoryChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
+
                     <!-- Transaksi Terbaru -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                         <div class="p-6">
@@ -231,6 +203,80 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Left column (2/3 width) - Moved down for mobile -->
+                <div class="lg:col-span-2 space-y-8 order-2 lg:order-1">
+                    <!-- Financial Statistics -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Statistik Keuangan</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Pemasukan vs Pengeluaran -->
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Pemasukan vs Pengeluaran</h4>
+                                    <div class="h-64">
+                                        <canvas id="incomeExpenseChart"></canvas>
+                                    </div>
+                                </div>
+                                
+                                <!-- Saldo Perbulan -->
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Saldo Perbulan</h4>
+                                    <div class="h-64">
+                                        <canvas id="balanceHistoryChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Penggunaan Budget per Kategori -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Penggunaan Budget per Kategori</h4>
+    <div class="h-64">
+        <canvas id="budgetUsageChart"></canvas>
+    </div>
+</div>
+
+<!-- Sisa Budget Bulanan -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4 text-center">
+        Sisa Budget Bulanan
+    </h4>
+    <div class="h-64 flex justify-center items-center">
+        <canvas id="remainingBudgetChart" class="max-w-full"></canvas>
+    </div>
+</div>
+
+<!-- Rata-rata Pengeluaran Harian -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Rata-rata Pengeluaran Harian</h4>
+    <div class="flex items-center justify-center h-64">
+        <p id="avgDailyExpense" class="text-2xl font-semibold text-gray-800 dark:text-white"></p>
+    </div>
+</div>
+
+<!-- Prediksi Sisa Saldo Akhir Bulan -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Prediksi Sisa Saldo di Akhir Bulan</h4>
+    <div class="h-64">
+        <canvas id="predictedBalanceChart"></canvas>
+    </div>
+</div>
+
+<!-- Persentase Kategori Pengeluaran Terbesar -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4 text-center">
+        Kategori Pengeluaran Terbesar
+    </h4>
+    <div class="h-64 flex justify-center items-center">
+        <canvas id="topSpendingCategoriesChart" class="max-w-full"></canvas>
+    </div>
+</div>
+
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
         </div>
     </div>
@@ -241,143 +287,110 @@
 <script src="https://unpkg.com/tippy.js@6"></script>
 
 <script>
-    // Chart data
-    fetch('/dashboard/data')
-    .then(response => response.json())
-    .then(data => {
-        // Pemasukan vs Pengeluaran Chart (Doughnut Chart)
-        const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+    document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const response = await fetch("/dashboard-data");
+        const data = await response.json();
 
-        new Chart(incomeExpenseCtx, {
-            type: 'doughnut',
+        // 🔹 Update rata-rata pengeluaran harian
+        document.getElementById("avgDailyExpense").innerText = `Rp ${data.dailyExpenseAvg.toLocaleString()}`;
+
+        // 🔹 Chart Pemasukan vs Pengeluaran (Doughnut Chart)
+        new Chart(document.getElementById("incomeExpenseChart").getContext("2d"), {
+            type: "doughnut",
             data: {
-                labels: ['Pemasukan', 'Pengeluaran'],
+                labels: ["Pemasukan", "Pengeluaran"],
                 datasets: [{
                     data: [data.income, data.expense],
-                    backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(248, 113, 113, 0.8)'],
-                    borderColor: ['rgb(16, 185, 129)', 'rgb(239, 68, 68)'],
+                    backgroundColor: ["rgba(52, 211, 153, 0.8)", "rgba(248, 113, 113, 0.8)"],
+                    borderColor: ["rgb(16, 185, 129)", "rgb(239, 68, 68)"],
                     borderWidth: 1,
                     borderRadius: 4,
                     hoverOffset: 6
                 }]
             },
             options: {
-                cutout: '65%',
+                cutout: "65%",
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 15,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
+                    legend: { position: "bottom" },
                     tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                        padding: 12,
-                        bodyFont: {
-                            size: 13
-                        },
+                        backgroundColor: "rgba(17, 24, 39, 0.8)",
                         callbacks: {
-                            label: function(tooltipItem) {
-                                return 'Rp ' + tooltipItem.raw.toLocaleString();
-                            }
+                            label: (tooltipItem) => `Rp ${tooltipItem.raw.toLocaleString()}`
                         }
                     }
-                },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true
                 }
             }
         });
 
-        // Saldo Perbulan (Line Chart)
-        const balanceHistoryCtx = document.getElementById('balanceHistoryChart').getContext('2d');
-
-        // Create gradient
+        // 🔹 Chart Saldo Perbulan (Line Chart)
+        const balanceHistoryCtx = document.getElementById("balanceHistoryChart").getContext("2d");
         const gradient = balanceHistoryCtx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
-        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+        gradient.addColorStop(0, "rgba(59, 130, 246, 0.5)");
+        gradient.addColorStop(1, "rgba(59, 130, 246, 0.0)");
 
         new Chart(balanceHistoryCtx, {
-            type: 'line',
+            type: "line",
             data: {
                 labels: data.balanceHistory.map(item => item.date),
                 datasets: [{
-                    label: 'Saldo',
+                    label: "Saldo",
                     data: data.balanceHistory.map(item => item.balance),
-                    borderColor: 'rgb(59, 130, 246)',
+                    borderColor: "rgb(59, 130, 246)",
                     backgroundColor: gradient,
                     fill: true,
-                    tension: 0.3,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgb(59, 130, 246)',
-                    pointBorderColor: 'rgb(255, 255, 255)',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 6,
-                    pointHoverBorderWidth: 2,
-                    borderWidth: 3
+                    tension: 0.3
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            drawBorder: false,
-                            color: 'rgba(226, 232, 240, 0.6)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return 'Rp ' + value.toLocaleString();
-                            },
-                            font: {
-                                size: 10
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                        padding: 12,
-                        bodyFont: {
-                            size: 13
-                        },
-                        callbacks: {
-                            label: function(context) {
-                                return 'Rp ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                animation: {
-                    duration: 2000,
-                    easing: 'easeOutQuart'
-                }
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 🔹 Chart Penggunaan Budget per Kategori (Bar Chart)
+        new Chart(document.getElementById("budgetUsageChart"), {
+            type: "bar",
+            data: {
+                labels: data.budgetUsage.map(b => b.category),
+                datasets: [
+                    { label: "Budget", data: data.budgetUsage.map(b => b.budget), backgroundColor: "rgba(54, 162, 235, 0.6)" },
+                    { label: "Terpakai", data: data.budgetUsage.map(b => b.spent), backgroundColor: "rgba(255, 99, 132, 0.6)" }
+                ]
             }
         });
-    });
+
+        // 🔹 Chart Sisa Budget (Doughnut Chart)
+        new Chart(document.getElementById("remainingBudgetChart"), {
+            type: "doughnut",
+            data: {
+                labels: ["Terpakai", "Tersisa"],
+                datasets: [{ data: [data.totalSpent, data.remainingBudget], backgroundColor: ["#FF6384", "#36A2EB"] }]
+            }
+        });
+
+        // 🔹 Chart Prediksi Saldo Akhir Bulan (Line Chart)
+        new Chart(document.getElementById("predictedBalanceChart"), {
+            type: "line",
+            data: {
+                labels: ["Hari Ini", "Minggu Depan", "Akhir Bulan"],
+                datasets: [{ label: "Prediksi Saldo", data: [data.totalBudget, data.remainingBudget, data.predictedBalance], borderColor: "#4CAF50", fill: false }]
+            }
+        });
+
+        // 🔹 Chart Kategori Pengeluaran Terbesar (Pie Chart)
+        new Chart(document.getElementById("topSpendingCategoriesChart"), {
+            type: "pie",
+            data: {
+                labels: data.topCategories.map(c => c.name),
+                datasets: [{ data: data.topCategories.map(c => c.total_spent), backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"] }]
+            }
+        });
+
+    } catch (error) {
+        console.error("Gagal mengambil data dashboard:", error);
+    }
+});
+
 
     // Tippy.js for tooltips with improved animation
     document.addEventListener('DOMContentLoaded', function() {
@@ -481,6 +494,7 @@
     }
 
     startAutoSlide();
+
 </script>
 
 </x-app-layout>
