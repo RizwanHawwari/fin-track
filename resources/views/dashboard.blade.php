@@ -1,6 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+            <button id="toggleVisibility" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path id="eyeOpen" d="M10 3C5 3 1 8 1 10s4 7 9 7 9-5 9-7-4-7-9-7zm0 12a5 5 0 110-10 5 5 0 010 10z"/>
+                    <path id="eyeSlash" class="hidden" d="M2.454 2.454a1 1 0 00-1.415 1.414l14.142 14.142a1 1 0 001.414-1.414L2.454 2.454zM10 14c-2.5 0-4.5-2-4.5-4.5S7.5 5 10 5s4.5 2 4.5 4.5S12.5 14 10 14z"/>
+                </svg>
+            </button>
+        </div>
     </x-slot>
 
     <div class="py-8">
@@ -18,7 +26,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalIncome, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white hidden-amount">Rp <span class="amount">{{ number_format($totalIncome, 0, ',', '.') }}</span></p>
                         <div class="mt-2 h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div class="h-full bg-green-500 rounded-full" style="width: 75%"></div>
                         </div>
@@ -36,7 +44,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalExpense, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white hidden-amount">Rp <span class="amount">{{ number_format($totalExpense, 0, ',', '.') }}</span></p>
                         <div class="mt-2 h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div class="h-full bg-red-500 rounded-full" style="width: 60%"></div>
                         </div>
@@ -54,7 +62,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalSaldo, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white hidden-amount">Rp <span class="amount">{{ number_format($totalSaldo, 0, ',', '.') }}</span></p>
                         <div class="mt-2 h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div class="h-full bg-blue-500 rounded-full" style="width: 85%"></div>
                         </div>
@@ -100,7 +108,7 @@
                                         <!-- Account Details -->
                                         <div class="flex-grow">
                                             <p class="text-base font-medium text-gray-900 dark:text-white">{{ $account->name }}</p>
-                                            <p class="text-lg font-bold text-gray-700 dark:text-gray-300">Rp {{ number_format($account->balance, 0, ',', '.') }}</p>
+                                            <p class="text-lg font-bold text-gray-700 dark:text-gray-300 hidden-amount">Rp <span class="amount">{{ number_format($account->balance, 0, ',', '.') }}</span></p>
                                         </div>
                                         
                                         <!-- Account Type Badge -->
@@ -183,9 +191,9 @@
                                         <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                                             {{ $transaction->description }}
                                         </p>
-                                        <p class="mt-1 text-lg font-semibold 
+                                        <p class="mt-1 text-lg font-semibold hidden-amount
                                             {{ $transaction->type == 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                            Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                            Rp <span class="amount">{{ number_format($transaction->amount, 0, ',', '.') }}</span>
                                         </p>
                                     </div>
                                 @endforeach
@@ -485,6 +493,38 @@
     }
 
     startAutoSlide();
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("toggleVisibility");
+    const amounts = document.querySelectorAll(".hidden-amount .amount");
+    const eyeOpen = document.getElementById("eyeOpen");
+    const eyeSlash = document.getElementById("eyeSlash");
+
+    // Simpan angka asli ke dalam data attribute (hanya jika belum ada)
+    amounts.forEach(amount => {
+        if (!amount.dataset.original) {
+            amount.dataset.original = amount.textContent.trim();  // Simpan angka asli
+        }
+    });
+
+    // Cek status dari LocalStorage
+    let isHidden = localStorage.getItem("hideAmount") === "true";
+    updateVisibility();
+
+    toggleButton.addEventListener("click", function () {
+        isHidden = !isHidden;
+        localStorage.setItem("hideAmount", isHidden);
+        updateVisibility();
+    });
+
+    function updateVisibility() {
+        amounts.forEach(amount => {
+            amount.textContent = isHidden ? "•••••" : amount.dataset.original;
+        });
+        eyeOpen.classList.toggle("hidden", isHidden);
+        eyeSlash.classList.toggle("hidden", !isHidden);
+    }
+});
 
 </script>
 
