@@ -1,6 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+            <button id="toggleVisibility" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path id="eyeOpen" d="M10 3C5 3 1 8 1 10s4 7 9 7 9-5 9-7-4-7-9-7zm0 12a5 5 0 110-10 5 5 0 010 10z"/>
+                    <path id="eyeSlash" class="hidden" d="M2.454 2.454a1 1 0 00-1.415 1.414l14.142 14.142a1 1 0 001.414-1.414L2.454 2.454zM10 14c-2.5 0-4.5-2-4.5-4.5S7.5 5 10 5s4.5 2 4.5 4.5S12.5 14 10 14z"/>
+                </svg>
+            </button>
+        </div>
     </x-slot>
 
     <div class="py-8">
@@ -18,7 +26,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalIncome, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white hidden-amount">Rp <span class="amount">{{ number_format($totalIncome, 0, ',', '.') }}</span></p>
                         <div class="mt-2 h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div class="h-full bg-green-500 rounded-full" style="width: 75%"></div>
                         </div>
@@ -36,7 +44,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalExpense, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white hidden-amount">Rp <span class="amount">{{ number_format($totalExpense, 0, ',', '.') }}</span></p>
                         <div class="mt-2 h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div class="h-full bg-red-500 rounded-full" style="width: 60%"></div>
                         </div>
@@ -54,7 +62,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalSaldo, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white hidden-amount">Rp <span class="amount">{{ number_format($totalSaldo, 0, ',', '.') }}</span></p>
                         <div class="mt-2 h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div class="h-full bg-blue-500 rounded-full" style="width: 85%"></div>
                         </div>
@@ -100,7 +108,7 @@
                                         <!-- Account Details -->
                                         <div class="flex-grow">
                                             <p class="text-base font-medium text-gray-900 dark:text-white">{{ $account->name }}</p>
-                                            <p class="text-lg font-bold text-gray-700 dark:text-gray-300">Rp {{ number_format($account->balance, 0, ',', '.') }}</p>
+                                            <p class="text-lg font-bold text-gray-700 dark:text-gray-300 hidden-amount">Rp <span class="amount">{{ number_format($account->balance, 0, ',', '.') }}</span></p>
                                         </div>
                                         
                                         <!-- Account Type Badge -->
@@ -168,40 +176,105 @@
                                 </a>
                             </div>
                             
-                            <div class="overflow-x-auto">
-                                <table class="w-full">
-                                    <thead>
-                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-tl-lg">Tanggal</th>
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700">Keterangan</th>
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700">Jumlah</th>
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-tr-lg">Tipe</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                        @foreach ($transactions->take(5) as $transaction)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                            <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                            <div class="space-y-4">
+                                @foreach ($transactions->take(5) as $transaction)
+                                    <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">
                                                 {{ \Carbon\Carbon::parse($transaction->transaction_date)->translatedFormat('d F Y') }}
-                                            </td>
-                                            <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                                                {{ $transaction->description }}
-                                            </td>
-                                            <td class="px-4 py-4 text-sm font-medium {{ $transaction->type == 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                                Rp {{ number_format($transaction->amount, 0, ',', '.') }}
-                                            </td>
-                                            <td class="px-4 py-4 text-sm">
-                                                <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $transaction->type == 'income' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-                                                    {{ ucfirst($transaction->type) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                            </span>
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-medium 
+                                                {{ $transaction->type == 'income' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                                {{ ucfirst($transaction->type) }}
+                                            </span>
+                                        </div>
+                                        <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $transaction->description }}
+                                        </p>
+                                        <p class="mt-1 text-lg font-semibold hidden-amount
+                                            {{ $transaction->type == 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                            Rp <span class="amount">{{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                                        </p>
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Left column (2/3 width) - Moved down for mobile -->
+                <div class="lg:col-span-2 space-y-8 order-2 lg:order-1">
+                    <!-- Financial Statistics -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-6">Statistik Keuangan</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Pemasukan vs Pengeluaran -->
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Pemasukan vs Pengeluaran</h4>
+                                    <div class="h-64">
+                                        <canvas id="incomeExpenseChart"></canvas>
+                                    </div>
+                                </div>
+                                
+                                <!-- Saldo Perbulan -->
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Saldo Perbulan</h4>
+                                    <div class="h-64">
+                                        <canvas id="balanceHistoryChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Penggunaan Budget per Kategori -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Penggunaan Budget per Kategori</h4>
+    <div class="h-64">
+        <canvas id="budgetUsageChart"></canvas>
+    </div>
+</div>
+
+<!-- Sisa Budget Bulanan -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4 text-center">
+        Sisa Budget Bulanan
+    </h4>
+    <div class="h-64 flex justify-center items-center">
+        <canvas id="remainingBudgetChart" class="max-w-full"></canvas>
+    </div>
+</div>
+
+<!-- Rata-rata Pengeluaran Harian -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Rata-rata Pengeluaran Harian</h4>
+    <div class="flex items-center justify-center h-64">
+        <p id="avgDailyExpense" class="text-2xl font-semibold text-gray-800 dark:text-white"></p>
+    </div>
+</div>
+
+<!-- Prediksi Sisa Saldo Akhir Bulan -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4">Prediksi Sisa Saldo di Akhir Bulan</h4>
+    <div class="h-64">
+        <canvas id="predictedBalanceChart"></canvas>
+    </div>
+</div>
+
+<!-- Persentase Kategori Pengeluaran Terbesar -->
+<div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-all duration-300 hover:shadow-md">
+    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-300 mb-4 text-center">
+        Kategori Pengeluaran Terbesar
+    </h4>
+    <div class="h-64 flex justify-center items-center">
+        <canvas id="topSpendingCategoriesChart" class="max-w-full"></canvas>
+    </div>
+</div>
+
                             </div>
                         </div>
                     </div>
+                    
                 </div>
                 
                 <!-- Left column (2/3 width) - Moved down for mobile -->
@@ -494,6 +567,38 @@
     }
 
     startAutoSlide();
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("toggleVisibility");
+    const amounts = document.querySelectorAll(".hidden-amount .amount");
+    const eyeOpen = document.getElementById("eyeOpen");
+    const eyeSlash = document.getElementById("eyeSlash");
+
+    // Simpan angka asli ke dalam data attribute (hanya jika belum ada)
+    amounts.forEach(amount => {
+        if (!amount.dataset.original) {
+            amount.dataset.original = amount.textContent.trim();  // Simpan angka asli
+        }
+    });
+
+    // Cek status dari LocalStorage
+    let isHidden = localStorage.getItem("hideAmount") === "true";
+    updateVisibility();
+
+    toggleButton.addEventListener("click", function () {
+        isHidden = !isHidden;
+        localStorage.setItem("hideAmount", isHidden);
+        updateVisibility();
+    });
+
+    function updateVisibility() {
+        amounts.forEach(amount => {
+            amount.textContent = isHidden ? "•••••" : amount.dataset.original;
+        });
+        eyeOpen.classList.toggle("hidden", isHidden);
+        eyeSlash.classList.toggle("hidden", !isHidden);
+    }
+});
 
 </script>
 

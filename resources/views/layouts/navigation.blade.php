@@ -25,7 +25,7 @@
             </div>
 
             <div class="flex items-center space-x-6">
-                <button id="darkModeToggle" class="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded">
+                <button id="darkModeToggle" class="px-4 py-2 hidden sm:block bg-white dark:bg-gray-800 text-black dark:text-white rounded">
                     🌙 / ☀️
                 </button>
 
@@ -111,6 +111,9 @@
             <x-responsive-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
                 {{ __('Accounts') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*')">
+                {{ __('Budgets') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Notifikasi di dalam menu responsif -->
@@ -125,6 +128,13 @@
                     <div class="py-2 text-gray-500 dark:text-gray-400 text-sm">Tidak ada notifikasi baru</div>
                 @endforelse
             </div>
+        </div>
+
+        <div class="border-t border-gray-200 dark:border-gray-600 py-3">
+            <div class="px-4 text-gray-800 dark:text-gray-200 font-semibold">Theme</div>
+            <button id="darkModeToggleMobile" class="px-3 py-2 mt-2 bg-white dark:bg-gray-800 text-black dark:text-white rounded">
+                🌙 / ☀️
+            </button>
         </div>
 
         <!-- Responsive Settings Options -->
