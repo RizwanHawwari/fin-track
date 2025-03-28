@@ -4,23 +4,78 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-                <!-- Informasi Transaksi -->
-                @if(session('show_transaction_info') !== 'hidden')
-                <div id="transaction-info" class="bg-blue-50 dark:bg-blue-900/40 border-l-4 border-blue-500 p-4 flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <p class="text-sm text-blue-700 dark:text-blue-300 mb-1.5">
-                            {{ $transactionInfo }}
-                        </p>
-                        <p class="text-xs font-medium text-blue-600 dark:text-blue-300">
-                            (Klik <button id="understand-btn" class="underline text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition">Mengerti</button> untuk menyembunyikan)
-                        </p>
-                    </div>
-                    <button id="close-info" class="text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-100 transition">&times;</button>
-                </div>
-                @endif
 
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-6 bg-blue-50 dark:bg-gray-800 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded-lg shadow-sm">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m0-4h.01M12 2a10 10 0 11-10 10A10 10 0 0112 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            Lacak Keuanganmu dengan Transactions 📊
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            Transactions adalah catatan pemasukan dan pengeluaran keuanganmu.
+                            Gunakan fitur ini untuk melacak transaksi secara rinci dan melihat histori keuanganmu kapan saja!
+                        </p>
+                        <button onclick="openTransactionModal()" class="mt-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 transition-colors">
+                            Informasi Selengkapnya →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Transactions -->
+        <div id="transactionModal" class="fixed z-[9999] inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden px-4">
+            <div class="bg-white dark:bg-gray-900 rounded-lg p-6 sm:p-8 max-w-lg w-full shadow-lg relative 
+                        sm:max-w-sm md:max-w-md lg:max-w-lg transition-all">
+                <!-- Ilustrasi -->
+                <div class="flex justify-center">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" 
+                         alt="Transaction Illustration" 
+                         class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 transition-all">
+                </div>
+        
+                <!-- Judul -->
+                <h3 class="text-xl md:text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mt-4 md:mt-6">
+                    Lacak Transaksi Keuanganmu dengan Mudah 💰
+                </h3>
+        
+                <!-- Isi Modal -->
+                <p class="mt-3 md:mt-5 text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">
+                    Dengan fitur <strong>Transactions</strong>, kamu bisa mencatat setiap pemasukan dan pengeluaran keuanganmu.
+                    Semua transaksi akan tersimpan dalam sistem dan bisa diakses kapan saja untuk membantu mengelola keuangan lebih baik.
+                </p>
+        
+                <p class="mt-3 md:mt-4 text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">
+                    Gunakan fitur ini untuk <strong>melihat riwayat transaksi</strong>, 
+                    <strong>menganalisis pola pengeluaran</strong>, dan membuat keputusan finansial yang lebih cerdas.
+                </p>
+        
+                <!-- Highlight Info -->
+                <div class="mt-4 md:mt-6 p-3 md:p-4 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-md 
+                            text-sm md:text-base leading-relaxed">
+                    Dengan fitur ini, kamu dapat <strong class="text-blue-700 dark:text-blue-300">melacak setiap pengeluaran</strong> 
+                    dan memastikan keuangan tetap sehat serta terkendali.
+                </div>
+        
+                <!-- CTA -->
+                <div class="mt-6 md:mt-8 text-center">
+                    <button onclick="closeTransactionModal()" 
+                            class="px-4 py-2 md:px-6 md:py-3 bg-blue-500 hover:bg-blue-600 text-white 
+                            text-sm md:text-base font-medium rounded-md shadow-md transition-all">
+                        Saya Mengerti
+                    </button>
+                </div>
+            </div>
+        </div>        
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">           
                 <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                         <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Transaksi</h3>
@@ -34,7 +89,7 @@
                                     </svg>
                                 </span>
                                 <input type="text" id="search" placeholder="Cari transaksi..."
-                                    class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg text-sm shadow-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
+                                    class="w-full z-[1] pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg text-sm shadow-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                                     oninput="filterTransactions()">
                             </div>
                             
@@ -173,31 +228,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Cek localStorage, kalau hidden, sembunyikan elemen
-            if (localStorage.getItem('hideTransactionInfo') === 'true') {
-                document.getElementById('transaction-info')?.remove();
-            }
 
-            document.getElementById('close-info')?.addEventListener('click', function () {
-                document.getElementById('transaction-info').remove();
-            });
+function openTransactionModal() {
+        document.getElementById("transactionModal").classList.remove("hidden");
+    }
 
-            document.getElementById('understand-btn')?.addEventListener('click', function () {
-                localStorage.setItem('hideTransactionInfo', 'true');
-                document.getElementById('transaction-info').remove();
-
-                // Kirim ke backend supaya session juga di-update
-                fetch("{{ route('hide.transaction.info') }}", { 
-                    method: "POST", 
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ hide: true })
-                });
-            });
-        });
+    function closeTransactionModal() {
+        document.getElementById("transactionModal").classList.add("hidden");
+    }
 
         function filterTransactions() {
             let search = document.getElementById("search").value.toLowerCase();

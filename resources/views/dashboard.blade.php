@@ -168,38 +168,29 @@
                                 </a>
                             </div>
                             
-                            <div class="overflow-x-auto">
-                                <table class="w-full">
-                                    <thead>
-                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-tl-lg">Tanggal</th>
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700">Keterangan</th>
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700">Jumlah</th>
-                                            <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-tr-lg">Tipe</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                        @foreach ($transactions->take(5) as $transaction)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                            <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                            <div class="space-y-4">
+                                @foreach ($transactions->take(5) as $transaction)
+                                    <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">
                                                 {{ \Carbon\Carbon::parse($transaction->transaction_date)->translatedFormat('d F Y') }}
-                                            </td>
-                                            <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                                                {{ $transaction->description }}
-                                            </td>
-                                            <td class="px-4 py-4 text-sm font-medium {{ $transaction->type == 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                                Rp {{ number_format($transaction->amount, 0, ',', '.') }}
-                                            </td>
-                                            <td class="px-4 py-4 text-sm">
-                                                <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $transaction->type == 'income' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-                                                    {{ ucfirst($transaction->type) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                            </span>
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-medium 
+                                                {{ $transaction->type == 'income' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                                {{ ucfirst($transaction->type) }}
+                                            </span>
+                                        </div>
+                                        <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $transaction->description }}
+                                        </p>
+                                        <p class="mt-1 text-lg font-semibold 
+                                            {{ $transaction->type == 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                            Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                        </p>
+                                    </div>
+                                @endforeach
                             </div>
+                            
                         </div>
                     </div>
                 </div>

@@ -27,10 +27,7 @@ class TransactionController extends Controller
                     ->latest()
                     ->paginate(10);
 
-    // Teks informasi yang bisa diubah dari backend
-    $transactionInfo = "Transactions adalah data catatan pemasukan dan pengeluaran keuangan Anda. Gunakan fitur ini untuk melacak transaksi secara rinci dan melihat histori keuangan.";
-
-    return view('transactions.index', compact('transactions', 'transactionInfo'));
+    return view('transactions.index', compact('transactions'));
     }
 
     public function create()
