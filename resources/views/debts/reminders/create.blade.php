@@ -23,6 +23,14 @@
                 <form action="{{ route('debt-reminders.store') }}" method="POST" class="space-y-6">
                     @csrf
 
+                    <!-- Judul Reminder -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Judul</label>
+                        <input type="text" name="title" required
+                            class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Masukkan judul reminder hutang">
+                    </div>
+
                     <!-- Nama Penerima -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Penerima</label>
@@ -34,7 +42,9 @@
                     <!-- Deskripsi Hutang -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi</label>
-                        <textarea name="description" class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Opsional"></textarea>
+                        <textarea name="description"
+                            class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Opsional"></textarea>
                     </div>
 
                     <!-- Jumlah Hutang -->

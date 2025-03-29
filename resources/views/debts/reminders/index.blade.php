@@ -119,6 +119,11 @@
                                 </svg>
                                 Hapus
                             </button>
+                            <form id="delete-form-{{ $reminder->id }}"
+                                action="{{ route('debt-reminders.destroy', $reminder->id) }}" method="POST" class="hidden">
+                                @csrf
+                                @method('DELETE')
+                            </form>
                         </div>
                     </div>
                 @endforeach
@@ -126,11 +131,30 @@
         </div>
     </div>
 
-    <!-- Modal Script -->
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function confirmDelete(reminderId) {
+            Swal.fire({
+                title: "Yakin mau hapus?",
+                text: "Reminder Hutang ini akan dihapus permanen!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-form-${reminderId}`).submit();
+                }
+            });
+        }
+
         function openModal() {
             document.getElementById("reminderModal").classList.remove("hidden");
         }
+
         function closeModal() {
             document.getElementById("reminderModal").classList.add("hidden");
         }

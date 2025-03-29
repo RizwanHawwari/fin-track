@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\DebtReminder;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreDebtReminderRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class DebtReminderController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $reminders = DebtReminder::forCurrentUser()->orderBy('due_date', 'asc')->get();
@@ -23,20 +27,22 @@ class DebtReminderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'title' => 'required|string|max:255',
             'counterparty' => 'required|string|max:255',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:1',
             'due_date' => 'required|date|after:today',
         ]);
-
+        
         DebtReminder::create([
             'user_id' => Auth::id(),
+            'title' => $validated['title'],
             'counterparty' => $validated['counterparty'],
             'description' => $validated['description'],
             'amount' => $validated['amount'],
             'due_date' => $validated['due_date'],
             'status' => 'pending',
-        ]);
+        ]);        
 
         return redirect()->route('debt-reminders.index')->with('success', 'Reminder hutang berhasil ditambahkan!');
     }

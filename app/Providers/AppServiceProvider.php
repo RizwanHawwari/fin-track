@@ -17,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
         Transaction::class => TransactionPolicy::class,
         Account::class => AccountPolicy::class,
         Budget::class => BudgetPolicy::class,
+        DebtReminder::class => DebtReminderPolicy::class,
     ];
     
     /**

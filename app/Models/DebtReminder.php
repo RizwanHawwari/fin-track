@@ -12,12 +12,13 @@ class DebtReminder extends Model
 
     protected $fillable = [
         'user_id',
+        'title',
         'counterparty',
         'description',
         'amount',
         'due_date',
         'status',
-    ];
+    ];    
 
     protected $casts = [
         'due_date' => 'date',
