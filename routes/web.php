@@ -8,6 +8,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\UserCategoryController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DebtReminderController;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -39,6 +40,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::resource('budgets', BudgetController::class)->middleware('auth');
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('debt-reminders', DebtReminderController::class);
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
