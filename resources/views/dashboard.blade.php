@@ -118,7 +118,7 @@
 
             <!-- Quick Actions - Mobile Only -->
             <div class="mb-6 mt-6 md:mt-10 lg:hidden">
-                <div class="flex overflow-x-auto justify-center pb-2 px-4 space-x-4 scrollbar-hide">
+                <div class="flex overflow-x-auto justify-center pb-2 px-4 space-x-3 md:space-x-8 scrollbar-hide">
                     <a href="{{ route('transactions.create') }}"
                         class="flex-shrink-0 flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-3 w-20 h-20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24"
