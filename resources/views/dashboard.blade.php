@@ -592,8 +592,6 @@
                                 "#9966FF"
                             ]
                         }]
-<<<<<<< HEAD
-=======
                     },
                     options: {
                         responsive: true,
@@ -603,7 +601,6 @@
                                 position: "bottom" // Agar legend tidak memakan banyak tempat
                             }
                         }
->>>>>>> v1-UI-improvement
                     }
                 });
 
