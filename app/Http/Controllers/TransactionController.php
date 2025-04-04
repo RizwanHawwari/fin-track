@@ -113,6 +113,9 @@ class TransactionController extends Controller
         $user = Auth::user();
         $account = Account::where('id', $transaction->account_id)->where('user_id', Auth::id())->firstOrFail();
 
+        // 🔥 SIMPAN NILAI SEBELUM DIUPDATE
+        $oldAmount = $transaction->amount;
+
         $cleanAmount = str_replace('.', '', $validated['amount']);
         $formattedAmount = number_format((float) $cleanAmount, 2, '.', '');
 
@@ -129,11 +132,7 @@ class TransactionController extends Controller
         }
 
         // 🔹 UPDATE TRANSAKSI
-        $transaction->update(
-            [
-                'amount' => $formattedAmount,
-            ] + $validated,
-        );
+        $transaction->update($validated);
 
         // 🔹 UPDATE SALDO AKUN
         if ($transaction->type === 'income') {
@@ -149,22 +148,21 @@ class TransactionController extends Controller
             'type' => $transaction->type,
         ]);
 
-        // 🔹 UPDATE BUDGET JIKA TRANSAKSI 'EXPENSE'
+        // 🔹 HANDLE BUDGETING (HANYA JIKA EXPENSE)
         if ($transaction->type === 'expense') {
             $budget = Budget::where('category_id', $transaction->category_id)->where('user_id', $user->id)->where('month', date('Y-m'))->first();
 
             if ($budget) {
-                $budget->increment('spent', $formattedAmount);
+                // 🔥 KURANGI OLD AMOUNT DULU, BARU TAMBAH YANG BARU
+                $budget->spent = max(0, $budget->spent - $oldAmount);
+                $budget->spent += $formattedAmount;
+                $budget->save();
 
-                // 🔹 Hitung persentase penggunaan budget
+                // Optional: Notifikasi
                 $percentUsed = ($budget->spent / $budget->amount) * 100;
-
-                // 🔹 Jika penggunaan budget di antara 80% - 99%, kirim Warning
                 if ($percentUsed >= 80 && $percentUsed < 100) {
                     $user->notify(new \App\Notifications\BudgetWarningNotification($budget));
                 }
-
-                // 🔹 Jika penggunaan sudah mencapai atau melebihi 100%, kirim ThresholdReached
                 if ($percentUsed >= 100) {
                     $user->notify(new \App\Notifications\BudgetThresholdReached($budget));
                 }
