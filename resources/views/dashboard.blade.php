@@ -100,7 +100,7 @@
             </div>
 
             <!-- Quick Stat Comparison (Responsive) -->
-            <div class="mt-4 grid grid-cols-3 gap-2 md:gap-6">
+            <div class="mt-6 grid grid-cols-3 gap-2 md:gap-6">
                 <div class="bg-white/80 dark:bg-gray-800/50 rounded-lg p-2 text-center">
                     <p class="text-xs text-gray-500 dark:text-gray-400">Income/Expense</p>
                     <p class="text-sm font-bold text-green-500 dark:text-green-400">Cooming Soon</p>

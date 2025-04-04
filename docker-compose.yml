@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+    app:
+        container_name: laravel_franken
+        build:
+            context: .
+        ports:
+            - "8081:80"
+        env_file:
+            - .env
+        volumes:
+            - .:/app
+            - ./public/build:/app/public/build
