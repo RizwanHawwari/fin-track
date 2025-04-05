@@ -46,7 +46,11 @@ class DashboardController extends Controller
         // 🔹 Ambil notifikasi terbaru
         $notifications = auth()->user()->unreadNotifications;
 
-        return view('dashboard', compact('totalIncome', 'totalExpense', 'accounts', 'transactions', 'balanceHistory', 'totalSaldo', 'totalAccountsBalance', 'notifications'));
+        $dailyMessages = ['Jangan remehin pengeluaran kecil, lama-lama bisa jadi lubang lho!', 'Keuangan oke, hati pun tenang. Kamu udah di jalur yang bener!', 'Yuk, catat lagi pengeluarannya — langkah kecil, hasilnya besar!', 'Hai ' . Auth::user()->name . ', udah sempet cek saldo hari ini belum?', 'Keuangan aman tuh mulai dari hal-hal simpel. Kamu keren udah mulai!', 'Dompet adem itu goals banget. Yuk, terus pantau pengeluaranmu!', 'Setiap catatan pengeluaran tuh langkah kecil menuju bebas finansial. Gas terus!', 'Kamu pantas banget hidup tanpa drama finansial. Lanjutkan kebiasaan kerennya!', 'Cuma satu klik atau cek, tapi bisa bantu atur masa depanmu lebih rapi', 'Kamu dan dompetmu? Bisa kok makin kompak dan tertata!'];
+
+        $dailyMessage = $dailyMessages[array_rand($dailyMessages)];
+
+        return view('dashboard', compact('totalIncome', 'totalExpense', 'accounts', 'transactions', 'balanceHistory', 'totalSaldo', 'totalAccountsBalance', 'notifications', 'dailyMessage'));
     }
 
     // Endpoint untuk mengambil data dashboard untuk chart

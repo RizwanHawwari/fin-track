@@ -17,6 +17,22 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                class="mb-4 p-3 lg:p-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 rounded-lg lg:rounded-xl shadow-sm lg:shadow-md flex items-start gap-3 lg:gap-3 transition-all duration-300 border border-indigo-100 dark:border-gray-700">
+                <div class="text-lg md:text-xl lg:text-2xl leading-none">
+                    ✨
+                </div>
+                <div class="flex-1">
+                    <p
+                        class="text-sm md:text-base lg:text-base font-medium text-gray-800 dark:text-gray-100 leading-snug">
+                        {{ $dailyMessage }}
+                    </p>
+                    <p class="mt-1 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                        You’ve got this — one step at a time.
+                    </p>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
                 <!-- Income Card - Compact design for mobile -->
                 <div
@@ -564,8 +580,8 @@
                         labels: ["Hari Ini", "Minggu Depan", "Akhir Bulan"],
                         datasets: [{
                             label: "Prediksi Saldo",
-                            data: [data.totalBudget, data.remainingBudget, data.predictedBalance
-                            ],
+                            data: [data.totalBudget, data.remainingBudget, data
+                                .predictedBalance],
                             borderColor: "#4CAF50",
                             fill: false
                         }]
